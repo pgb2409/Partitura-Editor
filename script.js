@@ -1,5 +1,5 @@
 // ==================================================================
-// VARIABLES GLOBALES (Mejoradas)
+// VARIABLES GLOBALES
 // ==================================================================
 let abcTextarea;
 let outputDiv;
@@ -21,7 +21,11 @@ w: (Simulación) Partitura ge-ne-ra-da por fun-ción Serverless.`;
 // FUNCIONES DE UTILIDAD (Debounce y Mensajes)
 // ==================================================================
 
-// Función para mostrar mensajes visuales
+/**
+ * Muestra un mensaje temporal al usuario.
+ * @param {string} msg - Mensaje a mostrar.
+ * @param {string} type - Tipo de mensaje ('success', 'error', 'info').
+ */
 function showMessage(msg, type = 'info') {
     const messageContainer = document.getElementById('messageContainer');
     if (!messageContainer) return;
