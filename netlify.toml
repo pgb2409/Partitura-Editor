@@ -1,0 +1,5 @@
+[dev]
+  # netlify dev no sabe dónde está index.html, lo forzamos a buscarlo en la carpeta raíz
+  publish = "."
+  # Este es el puerto del servidor estático que Netlify está usando, lo forzamos a 3999
+  targetPort = 3999
