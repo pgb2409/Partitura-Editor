@@ -1,34 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Partitura App - Editor y Descarga PDF</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <link rel="stylesheet" href="style.css"> 
-    
-    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0/dist/abcjs-basic-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Partitura App - Editor y Descarga PDF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="style.css"> 
+    
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0/dist/abcjs-basic-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-    <h1>Partitura App</h1>
+    <h1>Partitura App</h1>
 
-    <div class="container">
-        
-        <div class="controls">
-            <input type="file" id="fileInput" accept=".mp3,.wav,.ogg,.musicxml,.xml,.mxl">
-            
-            <button id="convertButton" onclick="handleConvertClick()">
-                Convertir a Partitura
-            </button>
-        </div>
-        
+    <div class="container">
+        
+        <div class="controls">
+            <input type="file" id="fileInput" accept=".mp3,.wav,.ogg,.musicxml,.xml,.mxl">
+            
+            <button id="convertButton" onclick="handleConvertClick()">
+                Convertir a Partitura
+            </button>
+        </div>
+        
         <div id="messageContainer" style="margin-bottom: 15px;"></div>
-        
-        <hr>
+        
+        <hr>
 
-        <textarea id="abcTextarea" rows="15" cols="80" placeholder="Escribe tu código ABC aquí para generar la partitura...">
+        <textarea id="abcTextarea" rows="15" cols="80" placeholder="Escribe tu código ABC aquí para generar la partitura...">
 X:1
 T:Minueto de Prueba
 M:4/4
@@ -36,18 +36,18 @@ L:1/4
 K:C
 |: CDEF | GABc | d2c2 | B2A2 :|
 </textarea>
-        
-        <hr>
+        
+        <hr>
 
-        <div id="output"></div>
-        
-        <div class="download-section">
-            <button id="downloadPdfButton" style="display:none;" onclick="downloadPdf()">
-                Descargar Partitura (PDF)
-            </button>
-        </div>
-    </div>
+        <div id="output"></div>
+        
+        <div class="download-section">
+            <button id="downloadPdfButton" style="display:none;" onclick="downloadPdf()">
+                Descargar Partitura (PDF)
+            </button>
+        </div>
+    </div>
 
-    <script src="/script.js"></script>
+    <script src="/script.js"></script>
 </body>
 </html>
