@@ -1,159 +1,58 @@
-// script.js - Versión final de la lógica del cliente
+// Partitura simulada de 40 compases con salto de línea.
+const longAbcNotation = `X:1
+T:Partitura Larga de Simulación
+M:4/4
+L:1/8
+K:C
+V:1 name="Voz 1"
+V:2 name="Voz 2" clef=bass
+
+[V:1] "C"C2E2G2c2 | "G"d2B2G2d2 | "Am"c2A2E2c2 | "Em"B2G2E2B2 | "F"A2c2E2A2 | "C"G2E2C2G2 | "G7"F2E2D2C2 | "C"C8 |
+[V:2] "C"C8 | "G"G8 | "Am"A8 | "Em"E8 | "F"F8 | "C"C8 | "G7"G,8 | "C"C8 |
+
+[V:1] "Dm"D2F2A2d2 | "Am"c2E2A2c2 | "G"B2D2G2B2 | "C"A2E2C2A2 | "F"G2C2F2G2 | "Bb"F2D2B,2F2 | "Eb"E2C2G,2E2 | "Ab"D2B,2F,2D2 |
+[V:2] "Dm"D8 | "Am"A8 | "G"G8 | "C"C8 | "F"F8 | "Bb"B,8 | "Eb"E,8 | "Ab"A,,8 |
+
+[V:1] "Db"Db2F2Ab2db2 | "Gb"c2Bb2F2c2 | "B"B2Eb2G#2B2 | "E"A2Db2Gb2A2 | "A"G2C2E2G2 | "D"F2B,2D2F2 | "E7"E2D2C2B,2 | "A"A8 |
+[V:2] "Db"Db8 | "Gb"Gb8 | "B"B8 | "E"E8 | "A"A8 | "D"D8 | "E7"E8 | "A"A,8 |
+
+[V:1] "Ebm"Eb2Gb2Bb2eb2 | "Abm"d2C2G2d2 | "Db"c2Bb2F2c2 | "Gb"B2Db2Gb2B2 | "Cb"A2Eb2Ab2A2 | "F#"G2D2B,2G2 | "Bbm"F2Eb2Db2C2 | "Ebm"Eb8 |
+[V:2] "Ebm"Eb8 | "Abm"Ab8 | "Db"Db8 | "Gb"Gb8 | "Cb"Cb8 | "F#"F#8 | "Bbm"Bb8 | "Ebm"Eb8 |
+`;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('audioFile');
-    const convertButton = document.getElementById('convertButton');
-    const outputDiv = document.getElementById('output');
-    const messageDiv = document.getElementById('message');
-    const abcTextarea = document.getElementById('abcTextarea');
-    const pdfDownloadButton = document.getElementById('downloadPdf');
+    const fileInput = document.getElementById('file-input');
+    const convertButton = document.getElementById('convert-button');
+    const partituraContainer = document.getElementById('partitura-container');
+    const messageContainer = document.getElementById('message-container');
 
-    // Función para renderizar la partitura
-    const renderABC = (abcNotation) => {
-        try {
-            // Limpia el área de visualización
-            outputDiv.innerHTML = '';
-            
-            // Renderiza la partitura ABC
-            ABCJS.renderAbc(outputDiv, abcNotation, {
-                add_classes: true,
-                staffwidth: 800,
-                responsive: 'resize',
-            });
-            
-            // Actualiza el textarea con la notación ABC
-            abcTextarea.value = abcNotation;
+    // Inicializa el renderizador de ABC.
+    ABCJS.renderAbc("partitura-container", "");
 
-        } catch (error) {
-            console.error("Error al renderizar ABC:", error);
-            messageDiv.textContent = 'Error al renderizar la partitura.';
-        }
-    };
+    // Manejador del botón de conversión.
+    convertButton.addEventListener('click', () => {
+        messageContainer.textContent = 'Procesando archivo (Simulación)...';
+        partituraContainer.innerHTML = ''; // Limpiar partitura anterior
 
-    // --- Lógica del Botón Convertir ---
-    convertButton.addEventListener('click', async () => {
-        const file = fileInput.files[0];
-        if (!file) {
-            messageDiv.textContent = 'Por favor, selecciona un archivo de audio.';
+        if (!fileInput.files.length) {
+            messageContainer.textContent = 'Por favor, selecciona un archivo de audio primero.';
             return;
         }
 
-        convertButton.disabled = true;
-        messageDiv.textContent = 'Procesando archivo... Esto es una simulación de 40 compases.';
-        outputDiv.innerHTML = 'Cargando...';
-
-        try {
-            // Usamos un FileReader para leer el contenido del archivo
-            const reader = new FileReader();
-            reader.readAsDataURL(file); // Lee el archivo como Base64 (necesario para la función Netlify)
-            
-            reader.onload = async () => {
-                const base64Content = reader.result.split(',')[1];
-                
-                const response = await fetch('/.netlify/functions/transcribe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    // Enviamos solo la información necesaria para la SIMULACIÓN
-                    body: JSON.stringify({
-                        fileContent: base64Content,
-                        fileType: file.type,
-                        fileName: file.name, // El nombre del archivo es lo único que usamos
-                    }),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Error en el servidor: ${errorData.error || response.statusText}`);
-                }
-
-                const data = await response.json();
-                
-                // Renderizar la partitura simulada
-                renderABC(data.abcNotation);
-                messageDiv.textContent = `Éxito: ${data.message}`;
-            };
-
-            reader.onerror = () => {
-                throw new Error("Error al leer el archivo de audio.");
-            };
-
-        } catch (error) {
-            console.error("Error en la conversión:", error);
-            // Mostrar un error genérico, ya que la API KEY no se necesita aquí.
-            messageDiv.textContent = `Error: ${error.message}`;
-        } finally {
-            convertButton.disabled = false;
-        }
-    });
-
-    // --- Lógica de Edición en Tiempo Real ---
-    abcTextarea.addEventListener('input', () => {
-        const newAbcNotation = abcTextarea.value;
-        try {
-            outputDiv.innerHTML = '';
-            ABCJS.renderAbc(outputDiv, newAbcNotation, {
-                add_classes: true,
-                staffwidth: 800,
-                responsive: 'resize',
-            });
-        } catch (error) {
-            // No hacemos nada, solo evitamos que se rompa la aplicación
-        }
-    });
-
-
-    // --- Lógica del Botón Descargar PDF ---
-    pdfDownloadButton.addEventListener('click', () => {
-        downloadPdf();
-    });
-
-    const downloadPdf = () => {
-        const abc = abcTextarea.value;
-        if (!abc) {
-            alert("No hay partitura para descargar.");
-            return;
-        }
-
-        const fileName = 'Partitura_Editada.pdf';
-        
-        // La función de impresión de abcjs funciona bien para generar PDF
-        ABCJS.renderAbc('hiddenPdfOutput', abc, {});
-        
-        // Simulación de descarga: Usamos la función de impresión del navegador
-        // para asegurar que se genera el PDF de la partitura.
-        
-        // Abre una nueva ventana de impresión
-        const printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write('<html><head><title>' + fileName + '</title>');
-        
-        // Copia los estilos de abcjs y la partitura
-        printWindow.document.write('<style>@media print { .abcjs-container { max-width: 100%; } }</style>');
-        printWindow.document.write('</head><body>');
-        printWindow.document.write(document.getElementById('output').innerHTML);
-        printWindow.document.write('</body></html>');
-        
-        printWindow.document.close();
-        printWindow.focus();
-        
-        // Pequeño retardo para asegurar que la partitura se renderiza antes de imprimir
+        // --- SIMULACIÓN DE PROCESAMIENTO ---
+        // Retraso para simular un proceso de transcripción real.
         setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 500); 
-    };
-
-    // Creamos un div oculto para la descarga, si fuera necesario
-    const hiddenPdfDiv = document.createElement('div');
-    hiddenPdfDiv.id = 'hiddenPdfOutput';
-    hiddenPdfDiv.style.display = 'none';
-    document.body.appendChild(hiddenPdfDiv);
-
-
-    // --- Estilos de Scroll y Renderizado Inicial ---
-
-    // Establece el scroll en el div de salida
-    outputDiv.style.maxHeight = '500px';
-    outputDiv.style.overflowY = 'scroll';
+            try {
+                // Renderizar la partitura de simulación.
+                ABCJS.renderAbc("partitura-container", longAbcNotation, {
+                    responsive: "resize",
+                    staffwidth: 750 // Ancho de la partitura
+                });
+                messageContainer.textContent = 'Partitura simulada cargada correctamente (40 compases).';
+            } catch (error) {
+                messageContainer.textContent = `Error al renderizar la partitura: ${error.message}`;
+            }
+        }, 3000); // 3 segundos de espera para simular la API
+        // ------------------------------------
+    });
 });
