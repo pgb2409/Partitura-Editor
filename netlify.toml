@@ -1,5 +1,7 @@
 [dev]
-  # netlify dev no sabe dónde está index.html, lo forzamos a buscarlo en la carpeta raíz
+  # Le dice a Netlify que la aplicación web (index.html) está en la carpeta actual (.)
   publish = "."
-  # Este es el puerto del servidor estático que Netlify está usando, lo forzamos a 3999
+  # Fuerza la carga en el puerto que usa para los archivos estáticos
   targetPort = 3999
+  # Esto le dice a Netlify que escuche en todas las interfaces de red (soluciona bloqueos en Windows)
+  address = "0.0.0.0"
