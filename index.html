@@ -2,52 +2,85 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Partitura App - Editor y Descarga PDF</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <link rel="stylesheet" href="style.css"> 
-    
-    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0/dist/abcjs-basic-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partitura Editor</title>
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.0/abcjs_basic_5.6.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .controls input[type="file"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+        .controls button {
+            padding: 10px 15px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .controls button:hover {
+            background-color: #4cae4c;
+        }
+        #message-container {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            text-align: center;
+        }
+        #partitura-container {
+            margin-top: 20px;
+            overflow-x: auto; /* Permite desplazamiento si la partitura es muy ancha */
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+    </style>
 </head>
 <body>
-
-    <h1>Partitura App</h1>
-
     <div class="container">
-        
+        <h1>Transcriptor de Audio a Partitura</h1>
         <div class="controls">
-            <input type="file" id="fileInput" accept=".mp3,.wav,.ogg,.musicxml,.xml,.mxl">
-            
-            <button id="convertButton" onclick="handleConvertClick()">
-                Convertir a Partitura
-            </button>
+            <input type="file" id="file-input" accept="audio/*">
+            <button id="convert-button">Convertir a Partitura</button>
         </div>
         
-        <div id="messageContainer" style="margin-bottom: 15px;"></div>
-        
-        <hr>
-
-        <textarea id="abcTextarea" rows="15" cols="80" placeholder="Escribe tu código ABC aquí para generar la partitura...">
-X:1
-T:Minueto de Prueba
-M:4/4
-L:1/4
-K:C
-|: CDEF | GABc | d2c2 | B2A2 :|
-</textarea>
-        
-        <hr>
-
-        <div id="output"></div>
-        
-        <div class="download-section">
-            <button id="downloadPdfButton" style="display:none;" onclick="downloadPdf()">
-                Descargar Partitura (PDF)
-            </button>
+        <div id="message-container">
+            Selecciona un archivo de audio (MP3, WAV, etc.) y haz clic en convertir.
         </div>
+
+        <div id="partitura-container">
+            </div>
     </div>
 
-    <script src="/script.js"></script>
+    <script src="script.js?v=99"></script> 
 </body>
 </html>
