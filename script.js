@@ -1,126 +1,159 @@
-// CÓDIGO PARA script.js
-const fileInput = document.getElementById('fileInput');
-const convertButton = document.getElementById('convertButton');
-const abcTextarea = document.getElementById('abcTextarea');
-const outputDiv = document.getElementById('output');
-const messageContainer = document.getElementById('messageContainer');
-const downloadPdfButton = document.getElementById('downloadPdfButton');
+// script.js - Versión final de la lógica del cliente
 
-const TRANSCRIBE_URL = '/.netlify/functions/transcribe'; 
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('audioFile');
+    const convertButton = document.getElementById('convertButton');
+    const outputDiv = document.getElementById('output');
+    const messageDiv = document.getElementById('message');
+    const abcTextarea = document.getElementById('abcTextarea');
+    const pdfDownloadButton = document.getElementById('downloadPdf');
 
-/**
- * Muestra una alerta temporal con los estilos CSS que proporcionaste.
- */
-function displayAlert(message, type) {
-    messageContainer.innerHTML = `<div class="alert ${type}">${message}</div>`;
-    setTimeout(() => {
-        messageContainer.innerHTML = ''; 
-    }, 8000); 
-}
+    // Función para renderizar la partitura
+    const renderABC = (abcNotation) => {
+        try {
+            // Limpia el área de visualización
+            outputDiv.innerHTML = '';
+            
+            // Renderiza la partitura ABC
+            ABCJS.renderAbc(outputDiv, abcNotation, {
+                add_classes: true,
+                staffwidth: 800,
+                responsive: 'resize',
+            });
+            
+            // Actualiza el textarea con la notación ABC
+            abcTextarea.value = abcNotation;
 
-/**
- * Función que maneja el clic en "Convertir a Partitura".
- */
-async function handleConvertClick() {
-    const file = fileInput.files[0];
-    
-    if (!file) {
-        displayAlert("Por favor, selecciona un archivo de audio o XML.", 'info');
-        return;
-    }
+        } catch (error) {
+            console.error("Error al renderizar ABC:", error);
+            messageDiv.textContent = 'Error al renderizar la partitura.';
+        }
+    };
 
-    convertButton.disabled = true;
-    convertButton.textContent = 'Convirtiendo... (Llamando al Servidor)';
-    displayAlert(`Procesando archivo: ${file.name}. Esto puede tardar unos segundos.`, 'info');
-
-    try {
-        // Leer el archivo como Base64 para enviarlo por JSON a la Netlify Function
-        const base64Content = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]); 
-            reader.onerror = error => reject(error);
-            reader.readAsDataURL(file);
-        });
-
-        // 1. Llamar a la Netlify Function
-        const response = await fetch(TRANSCRIBE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                fileName: file.name,
-                fileContent: base64Content,
-                fileType: file.type,
-            }),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.error || result.details || `Error del servidor: ${response.status}`);
+    // --- Lógica del Botón Convertir ---
+    convertButton.addEventListener('click', async () => {
+        const file = fileInput.files[0];
+        if (!file) {
+            messageDiv.textContent = 'Por favor, selecciona un archivo de audio.';
+            return;
         }
 
-        const newAbcCode = result.abcNotation;
+        convertButton.disabled = true;
+        messageDiv.textContent = 'Procesando archivo... Esto es una simulación de 40 compases.';
+        outputDiv.innerHTML = 'Cargando...';
+
+        try {
+            // Usamos un FileReader para leer el contenido del archivo
+            const reader = new FileReader();
+            reader.readAsDataURL(file); // Lee el archivo como Base64 (necesario para la función Netlify)
+            
+            reader.onload = async () => {
+                const base64Content = reader.result.split(',')[1];
+                
+                const response = await fetch('/.netlify/functions/transcribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // Enviamos solo la información necesaria para la SIMULACIÓN
+                    body: JSON.stringify({
+                        fileContent: base64Content,
+                        fileType: file.type,
+                        fileName: file.name, // El nombre del archivo es lo único que usamos
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Error en el servidor: ${errorData.error || response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                // Renderizar la partitura simulada
+                renderABC(data.abcNotation);
+                messageDiv.textContent = `Éxito: ${data.message}`;
+            };
+
+            reader.onerror = () => {
+                throw new Error("Error al leer el archivo de audio.");
+            };
+
+        } catch (error) {
+            console.error("Error en la conversión:", error);
+            // Mostrar un error genérico, ya que la API KEY no se necesita aquí.
+            messageDiv.textContent = `Error: ${error.message}`;
+        } finally {
+            convertButton.disabled = false;
+        }
+    });
+
+    // --- Lógica de Edición en Tiempo Real ---
+    abcTextarea.addEventListener('input', () => {
+        const newAbcNotation = abcTextarea.value;
+        try {
+            outputDiv.innerHTML = '';
+            ABCJS.renderAbc(outputDiv, newAbcNotation, {
+                add_classes: true,
+                staffwidth: 800,
+                responsive: 'resize',
+            });
+        } catch (error) {
+            // No hacemos nada, solo evitamos que se rompa la aplicación
+        }
+    });
+
+
+    // --- Lógica del Botón Descargar PDF ---
+    pdfDownloadButton.addEventListener('click', () => {
+        downloadPdf();
+    });
+
+    const downloadPdf = () => {
+        const abc = abcTextarea.value;
+        if (!abc) {
+            alert("No hay partitura para descargar.");
+            return;
+        }
+
+        const fileName = 'Partitura_Editada.pdf';
         
-        abcTextarea.value = newAbcCode;
-        renderAbcScore(newAbcCode);
+        // La función de impresión de abcjs funciona bien para generar PDF
+        ABCJS.renderAbc('hiddenPdfOutput', abc, {});
+        
+        // Simulación de descarga: Usamos la función de impresión del navegador
+        // para asegurar que se genera el PDF de la partitura.
+        
+        // Abre una nueva ventana de impresión
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>' + fileName + '</title>');
+        
+        // Copia los estilos de abcjs y la partitura
+        printWindow.document.write('<style>@media print { .abcjs-container { max-width: 100%; } }</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(document.getElementById('output').innerHTML);
+        printWindow.document.write('</body></html>');
+        
+        printWindow.document.close();
+        printWindow.focus();
+        
+        // Pequeño retardo para asegurar que la partitura se renderiza antes de imprimir
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500); 
+    };
 
-        displayAlert("¡Conversión Serverless exitosa! El circuito funciona.", 'success');
-        downloadPdfButton.style.display = 'block';
+    // Creamos un div oculto para la descarga, si fuera necesario
+    const hiddenPdfDiv = document.createElement('div');
+    hiddenPdfDiv.id = 'hiddenPdfOutput';
+    hiddenPdfDiv.style.display = 'none';
+    document.body.appendChild(hiddenPdfDiv);
 
-    } catch (error) {
-        console.error("Error en la conexión o en la función Serverless:", error);
-        displayAlert(`Error: ${error.message}. Asegúrate de que tu API KEY esté configurada.`, 'error');
-        downloadPdfButton.style.display = 'none';
-    } finally {
-        convertButton.disabled = false;
-        convertButton.textContent = 'Convertir a Partitura';
-    }
-}
 
-/**
- * Renderiza el código ABC en el div de salida.
- */
-function renderAbcScore(abcCode) {
-    abcjs.renderAbc(outputDiv, abcCode);
-}
+    // --- Estilos de Scroll y Renderizado Inicial ---
 
-// Escucha los cambios en el textarea para renderizar la partitura en tiempo real
-abcTextarea.addEventListener('input', () => {
-    const abcCode = abcTextarea.value;
-    renderAbcScore(abcCode);
+    // Establece el scroll en el div de salida
+    outputDiv.style.maxHeight = '500px';
+    outputDiv.style.overflowY = 'scroll';
 });
-
-// Renderizar la partitura inicial al cargar (si tiene contenido)
-renderAbcScore(abcTextarea.value); 
-
-
-/**
- * Función de DESCARGA PDF
- */
-function downloadPdf() {
-    const abcCode = abcTextarea.value;
-    const { jsPDF } = window.jspdf;
-    
-    const doc = new jsPDF();
-    doc.text("Partitura Generada", 10, 10);
-    
-    const abcElement = document.getElementById('output').querySelector('svg');
-    if (!abcElement) {
-         displayAlert("No hay partitura renderizada para descargar.", 'info');
-         return;
-    }
-    
-    const svgString = new XMLSerializer().serializeToString(abcElement);
-    const svgBase64 = btoa(unescape(encodeURIComponent(svgString)));
-    
-    doc.addImage(
-        `data:image/svg+xml;base64,${svgBase64}`, 
-        'SVG', 
-        10, 20, 
-        doc.internal.pageSize.getWidth() - 20, 
-        (abcElement.clientHeight / abcElement.clientWidth) * (doc.internal.pageSize.getWidth() - 20)
-    );
-    
-    doc.save("partitura_transcrita.pdf");
-}
-// NOTA: Tu botón "Convertir" en index.html debe llamar a handleConvertClick().
