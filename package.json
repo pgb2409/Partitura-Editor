@@ -1,0 +1,20 @@
+{
+  "name": "partitura-app",
+  "version": "1.0.0",
+  "description": "App para transcripción de audio a notación ABC con Netlify Functions",
+  "main": "netlify/functions/transcribe.js",
+  "scripts": {
+    "start": "netlify dev"
+  },
+  "dependencies": {
+    "@deepgram/sdk": "^3.1.0"
+  },
+  "keywords": [
+    "netlify",
+    "serverless",
+    "transcription",
+    "abcjs"
+  ],
+  "author": "",
+  "license": "ISC"
+}
