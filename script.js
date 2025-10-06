@@ -1,10 +1,10 @@
-/* CÓDIGO SIMPLIFICADO Y CORREGIDO PARA FORZAR LA CARGA LOCAL */
+/* ESTE CÓDIGO SOLO CARGA LA PANTALLA VERDE Y ELIMINA LA LLAMADA A LA API */
 document.addEventListener('DOMContentLoaded', () => {
     const convertButton = document.getElementById('convert-button');
     const inputArea = document.getElementById('input-text');
     const resultArea = document.getElementById('result-partitura');
 
-    // Deshabilita el botón y hace el campo de texto de solo lectura
+    // Deshabilita la interfaz original
     if (convertButton) {
         convertButton.style.display = 'none';
     }
@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
         inputArea.setAttribute('readonly', 'true');
     }
 
-    // Contenido de la simulación estática
+    // Contenido de la simulación estática (Recuadro Verde)
     const simulationContent = `
         <div style="border: 2px solid #4CAF50; padding: 15px; background-color: #e8f5e9; margin-top: 10px;">
             <h3>✅ SIMULACIÓN DE PARTITURA CARGADA CORRECTAMENTE</h3>
-            <p><strong>Estado:</strong> Aplicación funcionando en modo estático localmente.</p>
+            <p><strong>Estado:</strong> Aplicación funcionando en modo estático localmente (IGNORANDO NETLIFY).</p>
             <p><strong>Resultado:</strong></p>
             <pre style="background-color: #ffffff; padding: 10px; border: 1px dashed #4CAF50;">
 # Título: Prueba Estática
@@ -35,7 +35,7 @@ K: C
         resultArea.innerHTML = simulationContent;
     }
 
-    // Evita que el formulario haga cosas inesperadas
+    // Evita cualquier envío de formulario
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', (e) => {
