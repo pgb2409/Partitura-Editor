@@ -1,58 +1,55 @@
-// Partitura simulada de 40 compases con salto de línea.
-const longAbcNotation = `X:1
-T:Partitura Larga de Simulación
-M:4/4
-L:1/8
-K:C
-V:1 name="Voz 1"
-V:2 name="Voz 2" clef=bass
-
-[V:1] "C"C2E2G2c2 | "G"d2B2G2d2 | "Am"c2A2E2c2 | "Em"B2G2E2B2 | "F"A2c2E2A2 | "C"G2E2C2G2 | "G7"F2E2D2C2 | "C"C8 |
-[V:2] "C"C8 | "G"G8 | "Am"A8 | "Em"E8 | "F"F8 | "C"C8 | "G7"G,8 | "C"C8 |
-
-[V:1] "Dm"D2F2A2d2 | "Am"c2E2A2c2 | "G"B2D2G2B2 | "C"A2E2C2A2 | "F"G2C2F2G2 | "Bb"F2D2B,2F2 | "Eb"E2C2G,2E2 | "Ab"D2B,2F,2D2 |
-[V:2] "Dm"D8 | "Am"A8 | "G"G8 | "C"C8 | "F"F8 | "Bb"B,8 | "Eb"E,8 | "Ab"A,,8 |
-
-[V:1] "Db"Db2F2Ab2db2 | "Gb"c2Bb2F2c2 | "B"B2Eb2G#2B2 | "E"A2Db2Gb2A2 | "A"G2C2E2G2 | "D"F2B,2D2F2 | "E7"E2D2C2B,2 | "A"A8 |
-[V:2] "Db"Db8 | "Gb"Gb8 | "B"B8 | "E"E8 | "A"A8 | "D"D8 | "E7"E8 | "A"A,8 |
-
-[V:1] "Ebm"Eb2Gb2Bb2eb2 | "Abm"d2C2G2d2 | "Db"c2Bb2F2c2 | "Gb"B2Db2Gb2B2 | "Cb"A2Eb2Ab2A2 | "F#"G2D2B,2G2 | "Bbm"F2Eb2Db2C2 | "Ebm"Eb8 |
-[V:2] "Ebm"Eb8 | "Abm"Ab8 | "Db"Db8 | "Gb"Gb8 | "Cb"Cb8 | "F#"F#8 | "Bbm"Bb8 | "Ebm"Eb8 |
-`;
+/* ESTE CÓDIGO HA SIDO MODIFICADO PARA FORZAR LA SIMULACIÓN ESTÁTICA
+   Y EVITAR LLAMADAS A SERVIDORES/APIs/NETLIFY. */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('file-input');
+    // 1. Identificar las áreas de la página
     const convertButton = document.getElementById('convert-button');
-    const partituraContainer = document.getElementById('partitura-container');
-    const messageContainer = document.getElementById('message-container');
+    const inputArea = document.getElementById('input-text');
+    const resultArea = document.getElementById('result-partitura');
 
-    // Inicializa el renderizador de ABC.
-    ABCJS.renderAbc("partitura-container", "");
+    // 2. Ajustar la interfaz para modo Simulación
+    if (convertButton) {
+        convertButton.style.display = 'none'; // Ocultamos el botón
+    }
+    if (inputArea) {
+        inputArea.value = "SIMULACIÓN DE ENTRADA ESTATICA CARGADA";
+        inputArea.setAttribute('readonly', 'true');
+    }
 
-    // Manejador del botón de conversión.
-    convertButton.addEventListener('click', () => {
-        messageContainer.textContent = 'Procesando archivo (Simulación)...';
-        partituraContainer.innerHTML = ''; // Limpiar partitura anterior
+    // 3. Definir e Insertar el Contenido de la SIMULACIÓN ESTÁTICA
+    const simulationContent = `
+        <div style="border: 2px solid #4CAF50; padding: 15px; background-color: #e8f5e9; margin-top: 10px;">
+            <h3>✅ SIMULACIÓN DE PARTITURA CARGADA CORRECTAMENTE</h3>
+            <p><strong>Estado:</strong> Partitura-Editor está funcionando en modo estático (sin API ni Netlify).</p>
+            <p><strong>Resultado de la Simulación:</strong></p>
+            <pre style="background-color: #ffffff; padding: 10px; border: 1px dashed #4CAF50;">
+# Título: Partitura de Prueba Estática
+# Músico: Gemini Asistente
+# Versión: 1.0
 
-        if (!fileInput.files.length) {
-            messageContainer.textContent = 'Por favor, selecciona un archivo de audio primero.';
-            return;
-        }
+X: 1
+T: Canto Estático
+M: 4/4
+L: 1/4
+K: C
+"C"C D E F | "G"G2 "C"C2 |]
+            </pre>
+            <p style="font-size: 0.9em; color: #555;">Si ve este mensaje, la simulación funciona correctamente.</p>
+        </div>
+    `;
 
-        // --- SIMULACIÓN DE PROCESAMIENTO ---
-        // Retraso para simular un proceso de transcripción real.
-        setTimeout(() => {
-            try {
-                // Renderizar la partitura de simulación.
-                ABCJS.renderAbc("partitura-container", longAbcNotation, {
-                    responsive: "resize",
-                    staffwidth: 750 // Ancho de la partitura
-                });
-                messageContainer.textContent = 'Partitura simulada cargada correctamente (40 compases).';
-            } catch (error) {
-                messageContainer.textContent = `Error al renderizar la partitura: ${error.message}`;
-            }
-        }, 3000); // 3 segundos de espera para simular la API
-        // ------------------------------------
-    });
+    if (resultArea) {
+        resultArea.innerHTML = simulationContent;
+    } else {
+        // En caso de que no encontremos el área de resultado (poco probable)
+        console.error("No se encontró el área de resultado ('result-partitura') en index.html.");
+    }
+
+    // 4. Prevenir que se envíe cualquier formulario
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+        });
+    }
 });
