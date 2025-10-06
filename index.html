@@ -9,33 +9,18 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #fdfdfd;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        h1 {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
+        body {font-family: Arial, sans-serif; margin: 20px; background-color: #fdfdfd;}
+        .container {max-width: 800px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px;}
+        h1 {border-bottom: 2px solid #eee; padding-bottom: 10px;}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Partitura-Editor (Modo Simulación)</h1>
-        
+
         <form id="partitura-form">
             <label for="input-text">Texto de Entrada (Simulación):</label>
             <textarea id="input-text" rows="6" readonly>Aquí se cargará el mensaje de simulación. (Modo Estático)</textarea>
-
             <button id="convert-button" type="submit">Convertir a Partitura</button>
         </form>
 
